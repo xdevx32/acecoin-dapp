@@ -1,3 +1,4 @@
+# smart-contracts/Dockerfile
 FROM node:18
 
 WORKDIR /app
@@ -12,4 +13,5 @@ RUN npm install -g truffle
 # Copy the rest of the application code
 COPY . .
 
+# Compile and migrate contracts
 CMD ["truffle", "migrate", "--reset", "--network", "development"]
