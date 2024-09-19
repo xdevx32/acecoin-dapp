@@ -35,7 +35,60 @@ services:
       - ganache
     networks:
       - acecoin-network
+  
+  document-svc:
+    build: ./document-svc
+    container_name: document-svc
+    environment:
+      - PORT=3001
+      - IPFS_HOST=ipfs.infura.io
+      - IPFS_PORT=5001
+      - IPFS_PROTOCOL=https
+      - ETH_NODE_URL=${ETH_NODE_URL}
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./document-svc:/usr/src/app
+    restart: unless-stopped
 
+  coin-svc:
+    build: ./coin-svc
+    container_name: coin-svc
+    environment:
+      - eth.node.url=${ETH_NODE_URL}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./coin-svc:/app
+    restart: unless-stopped
+    depends_on:
+      - ganache
+
+  signing-svc:
+    build: ./signing-svc
+    container_name: signing-svc
+    environment:
+      - eth.node.url=${ETH_NODE_URL}
+      - contract.address=${CONTRACT_ADDRESS}
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./signing-svc:/app
+    restart: unless-stopped
+    depends_on:
+      - ganache
+
+  user-svc:
+    build: ./user-svc
+    container_name: user-svc
+    environment:
+      - PORT=3002
+      - JWT_SECRET=${JWT_SECRET}  # Ensure you have this in your .env or as an environment variable
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./user-svc:/app
+    restart: unless-stopped
 
 volumes:
   smart-contracts-build:
