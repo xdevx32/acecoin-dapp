@@ -1,10 +1,15 @@
-FROM node:14
+FROM node:18
 
 WORKDIR /app
 
+# Copy package files and install dependencies
 COPY package.json package-lock.json ./
 RUN npm install
 
+# Install Truffle globally
+RUN npm install -g truffle
+
+# Copy the rest of the application code
 COPY . .
 
 CMD ["truffle", "migrate", "--reset", "--network", "development"]
