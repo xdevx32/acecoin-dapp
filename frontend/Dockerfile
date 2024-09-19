@@ -1,11 +1,17 @@
-FROM node:14
+# frontend/Dockerfile
+FROM node:18
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+# Copy package files and install dependencies
+COPY ./frontend/package.json ./frontend/package-lock.json ./
 RUN npm install
 
-COPY . .
+# Copy the frontend source code
+COPY ./frontend/ ./
+
+# Copy the smart contract artifacts
+COPY ./smart-contracts/build/contracts ./contracts
 
 EXPOSE 3000
 

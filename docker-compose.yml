@@ -12,7 +12,8 @@ services:
       context: ./smart-contracts
     command: truffle migrate --reset --network development
     volumes:
-      - ./smart-contracts:/app
+      - ./smart-contracts:/app:cached,delegated
+      - /app/node_modules
     depends_on:
       - ganache
 
@@ -24,5 +25,8 @@ services:
     environment:
       - NEXT_PUBLIC_CONTRACT_ADDRESS=your_contract_address
       - NEXT_PUBLIC_NETWORK_ID=5777
+    volumes:
+      - ./frontend:/app:cached,delegated
+      - /app/node_modules
     depends_on:
       - smart-contracts
