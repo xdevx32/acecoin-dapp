@@ -1,20 +1,31 @@
-# Start with a base image that has Node.js 18
-FROM node:18
+# Dockerfile for user-svc
 
-# Set the working directory inside the container
+# Stage 1: Build the application
+FROM node:18.20.4 AS build
+
+# Set the working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY package*.json /app/
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application code
-COPY . .
+COPY ./ /app
 
-# Expose the port the app runs on
-EXPOSE 3002
+# Stage 2: Run the application
+FROM node:18.20.4-slim
 
-# Set the command to run the app
+# Set the working directory
+WORKDIR /app
+
+# Copy the built application from the build stage
+COPY --from=build /app /app
+
+# Expose the application port
+EXPOSE 3000
+
+# Set the entry point
 CMD ["npm", "start"]

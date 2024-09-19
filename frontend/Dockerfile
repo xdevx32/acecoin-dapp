@@ -1,19 +1,34 @@
-# frontend/Dockerfile
-FROM node:18
+# Dockerfile for frontend
 
-WORKDIR /app
+# Stage 1: Build the application
+FROM node:18.20.4 AS build
 
-# Copy package.json and package-lock.json to install dependencies
-COPY package.json package-lock.json ./
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY package*.json /usr/src/app/
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application code
-COPY . .
+COPY ./ /usr/src/app/
 
-# Expose the frontend port
+# Build the Next.js application
+RUN npm run build
+
+# Stage 2: Run the application
+FROM node:18.20.4-slim
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy the built application from the build stage
+COPY --from=build /usr/src/app /usr/src/app
+
+# Expose the application port
 EXPOSE 3000
 
-# Start the Next.js application
-CMD ["npm", "run", "dev"]
+# Set the entry point
+CMD ["npm", "start"]

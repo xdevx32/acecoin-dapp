@@ -1,4 +1,4 @@
-package com.acecoin.signing.controller;
+package com.acecoin.signing_svc;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

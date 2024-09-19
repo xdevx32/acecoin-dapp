@@ -1,22 +1,72 @@
+version: '3.8'
+
 services:
   ganache:
-    image: trufflesuite/ganache-cli
+    image: trufflesuite/ganache
+    platform: linux/arm64/v8
     ports:
-      - "7545:7545"
+      - "8545:8545"
+    command: --accounts 10 --defaultBalanceEther 100
     networks:
       - acecoin-network
 
-  smart-contracts:
+  coin-svc:
     build:
-      context: ./smart-contracts
+      context: ./coin-svc
       dockerfile: Dockerfile
-    volumes:
-      - ./smart-contracts:/app
-      - /app/node_modules
-      - smart-contracts-build:/app/build/contracts
-    command: npm run build
+    ports:
+      - "8081:8080"
     depends_on:
       - ganache
+    environment:
+      ETH_NODE_URL: ${ETH_NODE_URL}
+      CONTRACT_ADDRESS: ${CONTRACT_ADDRESS}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - acecoin-network
+
+  signing-svc:
+    build:
+      context: ./signing-svc
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:
+      - ganache
+    environment:
+      ETH_NODE_URL: ${ETH_NODE_URL}
+      CONTRACT_ADDRESS: ${CONTRACT_ADDRESS}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - acecoin-network
+
+  document-svc:
+    build:
+      context: ./document-svc
+      dockerfile: Dockerfile
+    ports:
+      - "8083:3000"
+    depends_on:
+      - ganache
+    environment:
+      ETH_NODE_URL: ${ETH_NODE_URL}
+      CONTRACT_ADDRESS: ${CONTRACT_ADDRESS}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - acecoin-network
+
+  user-svc:
+    build:
+      context: ./user-svc
+      dockerfile: Dockerfile
+    ports:
+      - "8084:3000"
+    depends_on:
+      - ganache
+    environment:
+      ETH_NODE_URL: ${ETH_NODE_URL}
+      CONTRACT_ADDRESS: ${CONTRACT_ADDRESS}
+      JWT_SECRET: ${JWT_SECRET}
     networks:
       - acecoin-network
 
@@ -24,74 +74,23 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - ../smart-contracts/build/contracts:/contracts
     ports:
       - "3000:3000"
     depends_on:
-      - smart-contracts
+      - document-svc
+      - user-svc
+    networks:
+      - acecoin-network
+
+  smart-contracts:
+    build:
+      context: ./smart-contracts
+      dockerfile: Dockerfile
+    depends_on:
       - ganache
     networks:
       - acecoin-network
-  
-  document-svc:
-    build: ./document-svc
-    container_name: document-svc
-    environment:
-      - PORT=3001
-      - IPFS_HOST=ipfs.infura.io
-      - IPFS_PORT=5001
-      - IPFS_PROTOCOL=https
-      - ETH_NODE_URL=${ETH_NODE_URL}
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./document-svc:/usr/src/app
-    restart: unless-stopped
-
-  coin-svc:
-    build: ./coin-svc
-    container_name: coin-svc
-    environment:
-      - eth.node.url=${ETH_NODE_URL}
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./coin-svc:/app
-    restart: unless-stopped
-    depends_on:
-      - ganache
-
-  signing-svc:
-    build: ./signing-svc
-    container_name: signing-svc
-    environment:
-      - eth.node.url=${ETH_NODE_URL}
-      - contract.address=${CONTRACT_ADDRESS}
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./signing-svc:/app
-    restart: unless-stopped
-    depends_on:
-      - ganache
-
-  user-svc:
-    build: ./user-svc
-    container_name: user-svc
-    environment:
-      - PORT=3002
-      - JWT_SECRET=${JWT_SECRET}  # Ensure you have this in your .env or as an environment variable
-    ports:
-      - "3002:3002"
-    volumes:
-      - ./user-svc:/app
-    restart: unless-stopped
-
-volumes:
-  smart-contracts-build:
 
 networks:
   acecoin-network:
+    driver: bridge

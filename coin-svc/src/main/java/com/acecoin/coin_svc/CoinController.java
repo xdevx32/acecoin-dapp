@@ -1,5 +1,6 @@
 package com.acecoin.coin.controller;
 
+import com.acecoin.coin_svc.TransferRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
