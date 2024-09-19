@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import AceCoinContract from './contracts/AceCoin.json';
+import AceCoinContract from '../contracts/AceCoin.json';
 
 const IndexPage = () => {
     const [account, setAccount] = useState('');
@@ -24,15 +24,34 @@ const IndexPage = () => {
     };
 
     const loadBlockchainData = async () => {
-        const web3 = window.web3;
-        const accounts = await web3.eth.getAccounts();
-        setAccount(accounts[0]);
-
-        const networkId = await web3.eth.net.getId();
-        const contractAddress = '0xAbCdEf1234567890aBcDef1234567890aBcDef12';
-        const contract = new web3.eth.Contract(AceCoinContract.abi, contractAddress);
-        setAceCoin(contract);
-    };
+        let web3;
+      
+        // Check if Web3 has been injected by the browser (MetaMask)
+        if (window.ethereum) {
+          web3 = new Web3(window.ethereum);
+          try {
+            // Request account access if needed
+            await window.ethereum.enable();
+          } catch (error) {
+            console.error("User denied account access");
+          }
+        } else if (window.web3) {
+          // Legacy dapp browsers...
+          web3 = new Web3(window.web3.currentProvider);
+        } else {
+          // Non-dapp browsers...
+          console.log("Non-Ethereum browser detected. You should consider trying MetaMask!");
+        }
+      
+        if (web3) {
+          const accounts = await web3.eth.getAccounts();
+          setAccount(accounts[0]);
+      
+          const networkId = await web3.eth.net.getId();
+          console.log("Network ID:", networkId);
+        }
+      };
+      
 
     const uploadDocument = async (e) => {
         e.preventDefault();
