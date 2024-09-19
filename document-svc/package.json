@@ -1,0 +1,16 @@
+{
+    "name": "document-svc",
+    "version": "1.0.0",
+    "description": "Document Service for AceCoin",
+    "main": "app.js",
+    "scripts": {
+      "start": "node app.js"
+    },
+    "dependencies": {
+      "dotenv": "^10.0.0",
+      "express": "^4.17.1",
+      "express-fileupload": "^1.2.1",
+      "ipfs-http-client": "^52.0.4",
+      "web3": "^1.5.2"
+    }
+  }
