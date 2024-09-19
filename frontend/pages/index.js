@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import AceCoinContract from '../../smart-contracts/build/contracts/AceCoin.json';
+import AceCoinContract from './contracts/AceCoin.json';
+
 const IndexPage = () => {
     const [account, setAccount] = useState('');
     const [document, setDocument] = useState(null);

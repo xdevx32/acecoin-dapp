@@ -10,8 +10,8 @@ RUN npm install
 # Install Truffle globally
 RUN npm install -g truffle
 
-# Copy the rest of the application code
+# Copy the smart contracts
 COPY . .
 
 # Compile and migrate contracts
-CMD ["truffle", "migrate", "--reset", "--network", "development"]
+CMD ["npm", "run", "build"]

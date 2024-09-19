@@ -6,16 +6,22 @@ services:
     command: ganache-cli -h 0.0.0.0 --networkId 5777
     ports:
       - '8545:8545'
+    networks:
+      - acecoin-network
 
   smart-contracts:
     build:
       context: ./smart-contracts
     command: truffle migrate --reset --network development
     volumes:
-      - ./smart-contracts:/app:cached,delegated
+      - ./smart-contracts:/app
       - /app/node_modules
+      - smart-contracts-build:/app/build/contracts
+      - ./smart-contracts/contracts:/app/contracts
     depends_on:
       - ganache
+    networks:
+      - acecoin-network
 
   frontend:
     build:
@@ -26,7 +32,15 @@ services:
       - NEXT_PUBLIC_CONTRACT_ADDRESS=your_contract_address
       - NEXT_PUBLIC_NETWORK_ID=5777
     volumes:
-      - ./frontend:/app:cached,delegated
-      - /app/node_modules
+      - ./frontend:/app
+      - smart-contracts-build:/app/contracts
     depends_on:
       - smart-contracts
+    networks:
+      - acecoin-network
+
+volumes:
+  smart-contracts-build:
+
+networks:
+  acecoin-network:

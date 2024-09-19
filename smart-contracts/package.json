@@ -4,12 +4,13 @@
     "description": "Smart Contracts for AceCoin",
     "scripts": {
         "compile": "truffle compile",
-        "migrate": "truffle migrate"
+        "migrate": "truffle migrate --network development",
+        "build": "truffle compile --all"
     },
     "dependencies": {
         "@openzeppelin/contracts": "^4.9.6"
     },
     "devDependencies": {
-        "truffle": "^5.4.11"
+        "truffle": "^5.11.5"
     }
 }
