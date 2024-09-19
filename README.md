@@ -1,262 +1,192 @@
-Sure! Here's the content for your `README.md` file:
 
-# AceCoin Project
+# AceCoin DApp
 
-AceCoin is a decentralized application (dApp) built on the Ethereum blockchain. It allows users to securely send and sign documents, storing them on the blockchain or an off-chain database. The project follows a microservices architecture for scalability and maintainability, utilizing Node.js, Java with Spring Boot, and Next.js.
+AceCoin DApp is a decentralized application that allows users to create and sign documents securely using blockchain technology. This project includes smart contracts written in Solidity, a frontend application built with Next.js, and utilizes Truffle and Ganache for development and testing.
 
 ## Table of Contents
-
-- [Project Structure](#project-structure)
+- [Introduction](#introduction)
+- [Features](#features)
 - [Prerequisites](#prerequisites)
-- [Setup Instructions](#setup-instructions)
-  - [1. Clone the Repository](#1-clone-the-repository)
-  - [2. Install Dependencies](#2-install-dependencies)
-  - [3. Configure Environment Variables](#3-configure-environment-variables)
-  - [4. Deploy Smart Contracts](#4-deploy-smart-contracts)
-  - [5. Run Microservices](#5-run-microservices)
-  - [6. Run the Frontend](#6-run-the-frontend)
+- [Project Structure](#project-structure)
+- [Setup Guide](#setup-guide)
+  - [Clone the Repository](#clone-the-repository)
+  - [Environment Variables](#environment-variables)
+  - [Using Docker (Recommended)](#using-docker-recommended)
+  - [Manual Setup](#manual-setup)
 - [Usage](#usage)
 - [Testing](#testing)
-- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
+- [Acknowledgments](#acknowledgments)
 
-## Project Structure
+## Introduction
+This project demonstrates a decentralized application (DApp) that allows users to create and sign documents stored on the Ethereum blockchain. It includes:
 
-```
-acecoin/
-├── document-svc/
-│   ├── app.js
-│   ├── package.json
-│   └── ...
-├── signing-svc/
-│   ├── src/
-│   ├── pom.xml
-│   └── ...
-├── user-svc/
-│   ├── app.js
-│   ├── package.json
-│   └── ...
-├── coin-svc/
-│   ├── src/
-│   ├── pom.xml
-│   └── ...
-├── smart-contracts/
-│   ├── acecoin.sol
-│   ├── acecoin-token.sol
-│   └── ...
-└── frontend/
-    ├── pages/
-    ├── package.json
-    └── ...
+- Smart Contracts: Written in Solidity and deployed using Truffle.
+- Frontend: Built with Next.js and interacts with the smart contracts via Web3.js or Ethers.js.
+- Local Blockchain: Ganache is used for local development and testing.
 
-- **document-svc**: Handles document uploading and retrieval.
-- **signing-svc**: Manages the document signing process via smart contracts.
-- **user-svc**: Manages user authentication and profiles.
-- **coin-svc**: Manages AceCoin token transactions.
-- **smart-contracts**: Contains Solidity smart contracts.
-- **frontend**: Next.js application for the user interface.
+## Features
+- Create documents with IPFS hash storage.
+- Sign documents on the blockchain.
+- ERC20 Token implementation (AceCoin Token).
 
 ## Prerequisites
+- Docker and Docker Compose installed on your system.
 
-Before setting up the project, ensure you have the following installed:
-
-- **Node.js** (v12 or higher)
-- **npm** or **yarn**
-- **Java JDK** (v11 or higher)
-- **Maven**
-- **Ganache CLI** or **Ganache GUI** (for local Ethereum blockchain)
-- **Truffle** or **Hardhat** (for smart contract deployment)
-- **MetaMask** browser extension
-- **Docker** (optional, for containerization)
-- **Git**
+## Project Structure
 ```
-## Setup Instructions
+acecoin-dapp/
+├── smart-contracts/
+│   ├── contracts/
+│   ├── migrations/
+│   ├── test/
+│   ├── truffle-config.js
+│   └── package.json
+├── frontend/
+│   ├── pages/
+│   ├── components/
+│   ├── public/
+│   ├── next.config.js
+│   └── package.json
+├── docker-compose.yml
+├── README.md
+└── .gitignore
+```
 
-### 1. Clone the Repository
+## Setup Guide
+
+### Clone the Repository
+```bash
+git clone git@github.com:xdevx32/acecoin-dapp.git
+cd acecoin-dapp
+```
+
+### Environment Variables
+
+Create environment variable files for the frontend and smart contracts.
+
+#### Frontend Environment Variables
+Create a `.env.local` file inside the `frontend/` directory.
 
 ```bash
-git clone https://github.com/yourusername/acecoin.git
-cd acecoin
+cd frontend
+touch .env.local
 ```
 
-### 2. Install Dependencies
+Add the following variables to `frontend/.env.local`:
 
-#### For Node.js Services (`document-svc`, `user-svc`)
+```makefile
+NEXT_PUBLIC_CONTRACT_ADDRESS=your_contract_address
+NEXT_PUBLIC_NETWORK_ID=5777
+```
 
-Navigate to each Node.js service directory and install dependencies:
+Replace `your_contract_address` with the deployed contract address if known.
+
+#### Smart Contracts Environment Variables
+If needed, create a `.env` file inside the `smart-contracts/` directory.
+
+### Using Docker (Recommended)
+This project includes Docker configurations to simplify setup and deployment.
+
+#### Requirements
+- Docker
+- Docker Compose
+
+#### Steps
+
+##### Build and Run Containers
+
+From the root directory `acecoin-dapp/`, run:
 
 ```bash
-cd document-svc
+docker-compose up --build
+```
+
+This command will build and start the following services:
+
+- `ganache`: A local blockchain instance.
+- `smart-contracts`: Compiles and migrates the smart contracts.
+- `frontend`: Serves the Next.js application.
+
+##### Access the Application
+
+Once the services are running, you can access the frontend application at:
+
+```arduino
+http://localhost:3000
+```
+
+##### Interact with the DApp
+
+Ensure you have MetaMask or another Web3 provider configured to connect to `http://localhost:8545` (Ganache). Import accounts from Ganache into your wallet if necessary.
+
+### Manual Setup
+If you prefer to run the project without Docker, follow these steps.
+
+#### Prerequisites
+- Node.js (version 14.x or higher)
+- npm or yarn
+- Truffle (`npm install -g truffle`)
+- Ganache CLI (`npm install -g ganache`) or Ganache GUI
+
+#### Steps
+
+##### Start Ganache
+```bash
+ganache --port 8545
+```
+
+Or start Ganache GUI and configure it to run on port 8545.
+
+##### Deploy Smart Contracts
+```bash
+cd smart-contracts
 npm install
-cd ../user-svc
-npm install
+truffle migrate --reset
 ```
 
-#### For Java Services (`signing-svc`, `coin-svc`)
+##### Update Frontend Configuration
+Copy the deployed contract addresses from the migration output. Update `frontend/.env.local` with the contract address and network ID.
 
-Navigate to each Java service directory and build the project:
-
-```bash
-cd ../signing-svc
-mvn clean install
-cd ../coin-svc
-mvn clean install
-```
-
-#### For the Frontend
-
+##### Start Frontend Application
 ```bash
 cd ../frontend
 npm install
-```
-
-### 3. Configure Environment Variables
-
-Create a `.env` file in each service directory that requires it. Below are example environment variables:
-
-#### `document-svc/.env`
-
-```
-PORT=3001
-IPFS_HOST=localhost
-IPFS_PORT=5001
-IPFS_PROTOCOL=http
-ETH_NODE_URL=http://localhost:8545
-CONTRACT_ADDRESS=YourDeployedContractAddress
-```
-
-#### `user-svc/.env`
-
-```
-PORT=3002
-JWT_SECRET=YourJWTSecret
-DB_CONNECTION=YourDatabaseConnectionString
-```
-
-#### `frontend/.env.local`
-
-```
-NEXT_PUBLIC_ETH_NODE_URL=http://localhost:8545
-NEXT_PUBLIC_CONTRACT_ADDRESS=YourDeployedContractAddress
-```
-
-### 4. Deploy Smart Contracts
-
-Navigate to the `smart-contracts` directory to compile and deploy the contracts.
-
-#### Using Truffle
-
-```bash
-cd ../smart-contracts
-npm install -g truffle
-truffle compile
-truffle migrate --network development
-```
-
-#### Using Hardhat
-
-```bash
-npm install --save-dev hardhat
-npx hardhat compile
-npx hardhat run scripts/deploy.js --network localhost
-```
-
-**Note:** Ensure Ganache is running before deploying contracts.
-
-### 5. Run Microservices
-
-Open separate terminal windows for each service.
-
-#### Start `document-svc`
-
-```bash
-cd ../document-svc
-npm start
-```
-
-#### Start `user-svc`
-
-```bash
-cd ../user-svc
-npm start
-```
-
-#### Start `signing-svc`
-
-```bash
-cd ../signing-svc
-mvn spring-boot:run
-```
-
-#### Start `coin-svc`
-
-```bash
-cd ../coin-svc
-mvn spring-boot:run
-```
-
-### 6. Run the Frontend
-
-```bash
-cd ../frontend
 npm run dev
 ```
 
-Access the application at `http://localhost:3000`.
+The application should now be running at `http://localhost:3000`.
 
 ## Usage
 
-1. **Connect MetaMask**: Open the frontend in your browser and connect your MetaMask wallet.
-
-2. **Register/Login**: Create an account or log in through the user interface.
-
-3. **Upload Documents**: Navigate to the document upload section to upload files.
-
-4. **Sign Documents**: View available documents and sign them using your Ethereum account.
-
-5. **Check Balances**: View your AceCoin token balance and transaction history.
+- Navigate to `http://localhost:3000` in your browser.
+- Connect your Web3 wallet (e.g., MetaMask) to the local blockchain.
+- Use the application to create and sign documents.
 
 ## Testing
 
-### Running Unit Tests
-
-#### For Node.js Services
-
+### Smart Contracts Tests
 ```bash
-cd document-svc
-npm test
+cd smart-contracts
+truffle test
 ```
 
-#### For Java Services
+### Frontend Tests
+If you have tests configured in your frontend application, you can run them using:
 
 ```bash
-cd signing-svc
-mvn test
+cd frontend
+npm run test
 ```
 
-### Running Integration Tests
-
-Implement integration tests as needed using testing frameworks like Jest for Node.js and JUnit for Java.
-
-## Troubleshooting
-
-- **Smart Contract Issues**: Ensure you're connected to the correct Ethereum network and that contracts are deployed properly.
-- **Port Conflicts**: Make sure no other applications are using the ports specified in the `.env` files.
-- **Dependency Errors**: Delete `node_modules` and run `npm install` again if you encounter issues.
-- **Database Connections**: Verify your database connection strings and that the databases are running.
+## Contributing
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or fixes.
 
 ## License
-
 This project is licensed under the MIT License.
 
-## Contact
-
-For questions or support, please contact:
-
-- **Name**: Your Name
-- **Email**: your.email@example.com
-- **GitHub**: [yourusername](https://github.com/yourusername)
-```
-
-Feel free to copy this content into a `README.md` file in your project directory.
+## Acknowledgments
+- OpenZeppelin for secure smart contract libraries.
+- Truffle Suite for development tools.
+- The Ethereum community for support and resources.

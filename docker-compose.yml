@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  ganache:
+    image: trufflesuite/ganache-cli
+    command: ganache-cli -h 0.0.0.0 --networkId 5777
+    ports:
+      - '8545:8545'
+
+  smart-contracts:
+    build:
+      context: ./smart-contracts
+    command: truffle migrate --reset --network development
+    volumes:
+      - ./smart-contracts:/app
+    depends_on:
+      - ganache
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_CONTRACT_ADDRESS=your_contract_address
+      - NEXT_PUBLIC_NETWORK_ID=5777
+    depends_on:
+      - smart-contracts
